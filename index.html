@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carles Broseta Garcia — Músico y Profesor</title>
+  <title>Carles Broseta Garcia — Profesor de Música</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" />
@@ -15,6 +15,12 @@
        NAV
   ════════════════════════════════════════════════════ -->
   <nav class="ph-nav" id="ph-nav">
+    <a href="dashboard.html" class="ph-nav-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Compás
+    </a>
     <div class="ph-nav-links">
       <a href="#sobre-mi" class="ph-nav-link">Sobre mí</a>
       <a href="#trayectoria" class="ph-nav-link">Trayectoria</a>
@@ -222,6 +228,7 @@
         <p class="ph-section-sub">Una selección de proyectos del currículum en secundaria.</p>
       </div>
 
+      <!-- Grid unificado: 5 visibles + tarjeta "Ver más" + extras ocultos -->
       <div class="ph-proj-grid" id="ph-proj-grid">
 
         <div class="ph-proj-card reveal" style="--card-color:#7c3aed">
@@ -249,11 +256,13 @@
           <p class="ph-proj-desc">Iniciación al ukelele: postura, acordes básicos e interpretación de canciones. Un instrumento accesible para explorar la armonía y el acompañamiento.</p>
         </div>
 
+        <!-- Posición 6: tarjeta "Ver más" integrada en el grid -->
         <div class="ph-proj-card-more reveal" id="proj-more-card" role="button" tabindex="0" aria-label="Ver más proyectos">
           <div class="ph-proj-more-icon">+</div>
           <div class="ph-proj-more-text">Ver más proyectos</div>
         </div>
 
+        <!-- Proyectos extra: ocultos hasta clic -->
         <div class="ph-proj-card ph-proj-extra" style="--card-color:#0d9488">
           <h3 class="ph-proj-title">Composición Musical</h3>
           <p class="ph-proj-desc">Crear una obra musical propia con Musescore, entendiendo estructura, armonía y orquestación.</p>
@@ -296,6 +305,7 @@
 
       </div>
 
+      <!-- Mostrar menos (aparece al expandir) -->
       <div class="ph-proj-less-wrap" id="proj-less-wrap">
         <button class="ph-proj-less-btn" id="proj-less-btn">↑ Mostrar menos</button>
       </div>
@@ -384,6 +394,7 @@
             </button>
           </form>
         </div>
+
       </div>
 
     </div>
