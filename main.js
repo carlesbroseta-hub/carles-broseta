@@ -1028,6 +1028,183 @@
     update();
   }
 
+  /* ── Hero: nombre y frase se escriben a máquina (TextType) ── */
+  function initHeroTyping() {
+    var box   = qs('.ph-hero-text');
+    var name  = qs('.ph-name');
+    var claim = qs('.ph-claim');
+    if (!box || !name || !claim || box.dataset.typed) return;
+    box.dataset.typed = '1';
+
+    function split(root) {
+      var chars = [];
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(function (node) {
+        var frag = document.createDocumentFragment();
+        Array.from(node.nodeValue.replace(/\s+/g, ' ').trim()).forEach(function (ch) {
+          var s = document.createElement('span');
+          s.className = 'tt-char';
+          s.textContent = ch;
+          frag.appendChild(s);
+          chars.push(s);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
+      return chars;
+    }
+
+    var nameChars  = split(name);
+    var claimChars = split(claim);
+    box.classList.add('tt-active');
+    /* Red de seguridad: pase lo que pase, a los 15 s todo el texto es visible */
+    setTimeout(function () {
+      qsa('.tt-char', box).forEach(function (c) { c.classList.add('is-on'); });
+    }, 15000);
+
+    var cursor = document.createElement('span');
+    cursor.className = 'tt-cursor no-glide is-idle';
+    cursor.setAttribute('aria-hidden', 'true');
+    box.appendChild(cursor);
+
+    var curEl = null, curAfter = false;
+    function place(el, after) {
+      curEl = el; curAfter = after;
+      var b  = box.getBoundingClientRect();
+      var r  = el.getBoundingClientRect();
+      var fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+      var h  = fs * 0.8;
+      var x  = (after ? r.right + fs * 0.05 : r.left - fs * 0.04) - b.left;
+      var y  = r.top + (r.height - h) / 2 - b.top;
+      cursor.style.width     = Math.max(2, Math.round(fs * 0.035)) + 'px';
+      cursor.style.height    = h.toFixed(1) + 'px';
+      cursor.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    }
+    function idle(on) { cursor.classList.toggle('is-idle', on); }
+    function show(el) { el.classList.add('is-on'); }
+    function hideNow(el) {
+      el.classList.add('tt-instant');
+      el.classList.remove('is-on');
+      void el.offsetWidth;
+      el.classList.remove('tt-instant');
+    }
+
+    /* Errores solo en la frase: un nombre con erratas no queda bien, ni siquiera un instante */
+    var NEAR = { a:'sq', b:'vn', c:'xv', d:'sf', e:'wr', f:'dg', g:'fh', h:'gj', i:'uo', j:'hk',
+                 l:'kñ', m:'n', n:'bm', o:'ip', p:'o', r:'et', s:'ad', t:'ry', u:'yi', v:'cb', ú:'u' };
+    var typoAt = {};
+    var candidates = [];
+    claimChars.forEach(function (c, k) {
+      var ch = c.textContent.toLowerCase();
+      var nxt = claimChars[k + 1];
+      if (k > 3 && NEAR[ch] && nxt && /\S/.test(nxt.textContent)) candidates.push(k);
+    });
+    for (var t = 0; t < 2 && candidates.length; t++) {
+      var pick = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
+      typoAt[pick] = true;
+      candidates = candidates.filter(function (k) { return Math.abs(k - pick) > 14; });
+    }
+
+    var steps = [];
+    nameChars.forEach(function (el)     { steps.push({ el: el, speed: 75, typo: false }); });
+    claimChars.forEach(function (el, k) { steps.push({ el: el, speed: 32, typo: !!typoAt[k] }); });
+
+    function jitter(ms) { return ms * (0.7 + Math.random() * 0.6); }
+
+    var i = 0, finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      steps.forEach(function (s) { show(s.el); });
+      cursor.classList.remove('is-jump');
+      place(steps[steps.length - 1].el, true);
+      idle(true);
+    }
+
+    function next() {
+      if (finished) return;
+      if (i >= steps.length) { finish(); return; }
+      var s    = steps[i];
+      var el   = s.el;
+      var prev = i > 0 ? steps[i - 1].el : null;
+
+      var newLine = prev && !s.jumped &&
+        (el.parentNode !== prev.parentNode || (el.previousSibling && el.previousSibling.nodeName === 'BR'));
+      if (newLine) {
+        s.jumped = true;
+        idle(true);
+        cursor.classList.add('is-jump');
+        place(el, false);
+        var pause = el === claimChars[0] ? 520 : (el.previousSibling && el.previousSibling.nodeName === 'BR' ? 200 : 300);
+        setTimeout(function () { cursor.classList.remove('is-jump'); next(); }, pause);
+        return;
+      }
+
+      idle(false);
+      if (s.typo) {
+        s.typo = false;
+        var real = el.textContent;
+        var opts = NEAR[real.toLowerCase()];
+        el.textContent = opts.charAt(Math.floor(Math.random() * opts.length));
+        show(el);
+        place(el, true);
+        setTimeout(function () {
+          idle(true);
+          setTimeout(function () {
+            hideNow(el);
+            el.textContent = real;
+            if (prev && prev.parentNode === el.parentNode) place(prev, true); else place(el, false);
+            idle(false);
+            setTimeout(next, 140);
+          }, 260);
+        }, jitter(s.speed));
+        return;
+      }
+
+      show(el);
+      place(el, true);
+      i++;
+      setTimeout(next, jitter(el.textContent === ' ' ? s.speed * 1.4 : s.speed));
+    }
+
+    function start() {
+      place(steps[0].el, false);
+      void cursor.offsetWidth;
+      cursor.classList.remove('no-glide');
+      cursor.classList.add('is-ready');
+      setTimeout(next, 450);
+    }
+
+    window.addEventListener('resize', function () { if (curEl) place(curEl, curAfter); });
+
+    if (document.visibilityState === 'hidden') {
+      document.addEventListener('visibilitychange', function onVis() {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onVis);
+        start();
+      });
+    } else {
+      start();
+    }
+  }
+
+  /* ── Proyectos: borde con estrella al pasar el ratón (StarBorder) ── */
+  function initProjStarBorder() {
+    qsa('.ph-proj-card').forEach(function (card) {
+      if (qs('.ph-star', card)) return;
+      var star = document.createElement('span');
+      star.className = 'ph-star';
+      star.setAttribute('aria-hidden', 'true');
+      card.insertBefore(star, card.firstChild);
+      card.addEventListener('click', function () {
+        star.classList.remove('is-pulse');
+        void star.offsetWidth;
+        star.classList.add('is-pulse');
+      });
+    });
+  }
+
   /* ── Trayectoria: iluminación por bloque al hacer scroll ── */
   function initTrayReveal() {
     var section = qs('#trayectoria');
@@ -1116,6 +1293,8 @@
   /* ── Profesor Page ─────────────────────────────────── */
   function initProfesor() {
     safe(initHeroPhotoScroll, "initHeroPhotoScroll");
+    safe(initHeroTyping, "initHeroTyping");
+    safe(initProjStarBorder, "initProjStarBorder");
     safe(initTrayReveal,  "initTrayReveal");
     safe(initAboutReveal, "initAboutReveal");
     safe(initReveals, "initReveals");

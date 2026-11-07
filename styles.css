@@ -4322,7 +4322,33 @@ body[data-page="profesor"] .ph-hero-inner {
   overflow: hidden;
   box-sizing: border-box;
 }
-body[data-page="profesor"] .ph-hero-text { will-change: transform, opacity; }
+body[data-page="profesor"] .ph-hero-text { will-change: transform, opacity; position: relative; }
+
+/* ── Hero: nombre y frase escritos a máquina (TextType). Lo activa initHeroTyping;
+      sin JS no existe .tt-active y el texto entra con su animación normal. ── */
+body[data-page="profesor"] .tt-active .ph-name-line,
+body[data-page="profesor"] .tt-active .ph-claim { animation: none; }
+.tt-char { opacity: 0; transition: opacity 0.24s ease-out; }
+.tt-char.is-on { opacity: 1; }
+.tt-char.tt-instant { transition: none; }
+.tt-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #D4A574;
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s ease, width 0.3s ease, opacity 0.3s ease;
+}
+.tt-cursor.is-ready { opacity: 1; }
+.tt-cursor.is-jump { transition-duration: 0.38s, 0.3s, 0.3s, 0.3s; }
+.tt-cursor.no-glide { transition: none; }
+.tt-cursor.is-idle { animation: ttBlink 1.05s ease-in-out infinite; }
+@keyframes ttBlink {
+  0%, 45%   { opacity: 1; }
+  55%, 100% { opacity: 0.1; }
+}
 
 /* El negro de cbg-hero.jpg está fijado a #0E0E10 al exportarla: sus bordes son invisibles
    sobre la página, así que no hacen falta máscaras ni degradados laterales. */
@@ -4595,6 +4621,55 @@ body[data-page="profesor"] .ph-proj-card-cta {
   border-color: rgba(212,165,116,0.2);
 }
 body[data-page="profesor"] .ph-proj-cta-label { color: rgba(161,160,160,0.5); }
+
+/* ── StarBorder: una estrella blanca con estela recorre el borde al pasar el ratón.
+      .ph-star la inserta initProjStarBorder; el padre da el brillo, el ::before es el anillo. ── */
+@property --star-a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+body[data-page="profesor"] .ph-star {
+  position: absolute;
+  inset: 0;
+  border-radius: 18.5px; /* 20px de la tarjeta menos su borde de 1.5px */
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  /* Brillo reforzado: el hover rellena la tarjeta de dorado y ahí el blanco se perdía */
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 5px rgba(255, 255, 255, 0.75));
+}
+body[data-page="profesor"] .ph-star::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  /* Estela de 0.3 vueltas (108°) que termina en la cabeza brillante */
+  background: conic-gradient(from var(--star-a), transparent 0deg 252deg, rgba(255, 255, 255, 0.12) 270deg, #fff 359deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  /* Pausada fuera del hover: así al salir no salta al punto de partida mientras se desvanece */
+  animation: phStarLap 4s linear infinite paused;
+}
+body[data-page="profesor"] .ph-proj-card:hover .ph-star { opacity: 1; }
+body[data-page="profesor"] .ph-proj-card:hover .ph-star::before { animation-play-state: running; }
+@keyframes phStarLap {
+  to { --star-a: 360deg; }
+}
+body[data-page="profesor"] .ph-star.is-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: phStarPulse 0.65s ease-out;
+}
+@keyframes phStarPulse {
+  from { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), inset 0 0 22px rgba(255, 255, 255, 0.35); }
+  to   { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0),   inset 0 0 44px rgba(255, 255, 255, 0); }
+}
 
 /* ── Videos ──────────────────────────────────────────── */
 body[data-page="profesor"] .ph-videos { background: #0E0E10; }
