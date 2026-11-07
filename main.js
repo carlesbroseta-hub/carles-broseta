@@ -1373,48 +1373,123 @@
     }
   }
 
+  /* ── Contacto: el mensaje llega por email vía Web3Forms ── */
   function initMensajeForm() {
     var form = qs("#msg-form");
-    if (!form) return;
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = "1";
+
+    /* Clave de acceso de Web3Forms: es pública por diseño (solo permite enviar a carlesbroseta.music@gmail.com) */
+    var ACCESS_KEY = "554fc15d-7e14-446d-b1d2-0fac10e5a380";
+    var EMAIL_RE   = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    var fields = {
+      name:  { el: qs("#msg-name"),  err: qs("#msg-name-error") },
+      email: { el: qs("#msg-email"), err: qs("#msg-email-error") },
+      text:  { el: qs("#msg-text"),  err: qs("#msg-text-error") }
+    };
+    var status = qs("#msg-status");
+    var btn    = qs('button[type="submit"]', form);
+    var labels = qsa(".ph-ihb-text, .ph-ihb-reveal span", btn);
+    var btnText = labels.length ? labels[0].textContent : "";
+
+    function setError(f, msg) {
+      f.el.classList.toggle("is-invalid", !!msg);
+      f.el.setAttribute("aria-invalid", msg ? "true" : "false");
+      f.err.textContent = msg || "";
+    }
+    Object.keys(fields).forEach(function (k) {
+      fields[k].el.addEventListener("input", function () { setError(fields[k], ""); });
+    });
+
+    function validate(v) {
+      var first = null;
+      function fail(f, msg) { setError(f, msg); if (!first) first = f.el; }
+      if (!v.name) fail(fields.name, "Escribe tu nombre.");
+      if (!v.email) fail(fields.email, "Escribe tu email para que pueda responderte.");
+      else if (!EMAIL_RE.test(v.email)) fail(fields.email, "Ese email no parece correcto. Revísalo.");
+      if (!v.text) fail(fields.text, "Escribe tu mensaje.");
+      if (first) first.focus();
+      return !first;
+    }
+
+    function setSending(on) {
+      btn.disabled = on;
+      btn.classList.toggle("is-sending", on);
+      labels.forEach(function (l) { l.textContent = on ? "Enviando…" : btnText; });
+    }
+
+    function showStatus(msg, isError) {
+      status.textContent = msg;
+      status.classList.toggle("is-error", !!isError);
+    }
+
+    function showSent(name) {
+      var box = document.createElement("div");
+      box.className = "ph-msg-sent";
+      box.setAttribute("role", "status");
+      box.innerHTML =
+        '<div class="ph-msg-sent-icon" aria-hidden="true">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="28" height="28" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
+        '</div>' +
+        '<h3 class="ph-msg-sent-title">Mensaje enviado</h3>' +
+        '<p class="ph-msg-sent-text"></p>' +
+        '<button type="button" class="ph-btn-ghost ph-msg-again">Enviar otro mensaje</button>';
+      qs(".ph-msg-sent-text", box).textContent =
+        "Gracias, " + name + ". Te responderé a tu email lo antes posible.";
+      qs(".ph-msg-again", box).addEventListener("click", function () {
+        box.remove();
+        form.reset();
+        form.hidden = false;
+        fields.name.el.focus();
+      });
+      form.hidden = true;
+      form.parentNode.insertBefore(box, form.nextSibling);
+    }
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var name   = (qs("#msg-name")   || {}).value || "";
-      var text   = (qs("#msg-text")   || {}).value || "";
-      var course = (qs("#msg-course") || {}).value || "ESO";
+      if (btn.disabled) return;
+      showStatus("");
 
-      if (!name.trim() || !text.trim()) {
-        var nameEl = qs("#msg-name");
-        if (nameEl && !nameEl.value.trim()) {
-          nameEl.style.borderColor = "var(--rose)";
-          nameEl.focus();
-        }
-        return;
-      }
+      var v = {
+        name:  fields.name.el.value.trim(),
+        email: fields.email.el.value.trim(),
+        text:  fields.text.el.value.trim()
+      };
+      if (!validate(v)) return;
 
-      var msgs = JSON.parse(localStorage.getItem("compas_msgs") || "[]");
-      msgs.push({
-        from:   name.trim(),
-        course: course,
-        text:   text.trim(),
-        date:   new Date().toLocaleDateString("es-ES", { day:"2-digit", month:"short" }),
-        time:   new Date().toLocaleTimeString("es-ES", { hour:"2-digit", minute:"2-digit" }),
-      });
-      localStorage.setItem("compas_msgs", JSON.stringify(msgs));
+      var bot = qs('input[name="botcheck"]', form);
+      if (bot && bot.checked) return;
 
-      /* Success state */
-      var msgCard = qs(".msg-card");
-      if (msgCard) {
-        msgCard.innerHTML =
-          '<div style="text-align:center;padding:20px 0;">' +
-            '<div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--teal));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(124,58,237,0.3);">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="32" height="32"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
-            '</div>' +
-            '<h3 style="font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:8px;">¡Mensaje enviado!</h3>' +
-            '<p style="font-size:0.85rem;color:var(--ink-mute);font-weight:500;">El Prof. Carles lo verá en su bandeja de entrada.</p>' +
-          '</div>';
-      }
-      safe(updateInboxCount, "updateInboxCount");
+      setSending(true);
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          access_key: ACCESS_KEY,
+          subject:    "Nuevo mensaje desde tu web — " + v.name,
+          from_name:  "Web de Carles Broseta",
+          name:       v.name,
+          email:      v.email,
+          message:    v.text,
+          botcheck:   false
+        })
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (data) {
+            if (!r.ok || !data.success) throw new Error(data.message || ("HTTP " + r.status));
+          });
+        })
+        .then(function () {
+          setSending(false);
+          showSent(v.name);
+        })
+        .catch(function (err) {
+          console.warn("[Compás] Envío de mensaje fallido:", err);
+          setSending(false);
+          showStatus("No se ha podido enviar el mensaje. Revisa tu conexión e inténtalo de nuevo.", true);
+        });
     });
   }
 

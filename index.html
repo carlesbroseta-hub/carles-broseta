@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261107e" />
+  <link rel="stylesheet" href="styles.css?v=20261107f" />
 </head>
 <body data-page="profesor">
 
@@ -366,14 +366,24 @@
       <div class="ph-contact-right reveal">
         <div id="msg-form-container">
           <form id="msg-form" novalidate>
+            <input type="checkbox" name="botcheck" class="ph-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <div class="form-group">
-              <label class="form-label ph-form-label">Tu nombre</label>
-              <input type="text" class="form-input" id="msg-name" placeholder="¿Cómo te llamas?" />
+              <label class="form-label ph-form-label" for="msg-name">Tu nombre</label>
+              <input type="text" class="form-input" id="msg-name" name="name" autocomplete="name"
+                placeholder="¿Cómo te llamas?" aria-describedby="msg-name-error" required />
+              <p class="ph-field-error" id="msg-name-error"></p>
             </div>
             <div class="form-group">
-              <label class="form-label ph-form-label">Tu mensaje</label>
-              <textarea class="form-textarea" id="msg-text" rows="5"
-                placeholder="Escribe aquí tu pregunta o comentario..."></textarea>
+              <label class="form-label ph-form-label" for="msg-email">Tu email</label>
+              <input type="email" class="form-input" id="msg-email" name="email" autocomplete="email"
+                placeholder="tu@email.com" aria-describedby="msg-email-error" required />
+              <p class="ph-field-error" id="msg-email-error"></p>
+            </div>
+            <div class="form-group">
+              <label class="form-label ph-form-label" for="msg-text">Tu mensaje</label>
+              <textarea class="form-textarea" id="msg-text" name="message" rows="5"
+                placeholder="Escribe aquí tu pregunta o comentario..." aria-describedby="msg-text-error" required></textarea>
+              <p class="ph-field-error" id="msg-text-error"></p>
             </div>
             <button type="submit" class="ph-btn-primary ph-ihb" style="width:100%;justify-content:center;">
               <span class="ph-ihb-text">Enviar mensaje</span>
@@ -383,6 +393,7 @@
               </div>
               <div class="ph-ihb-dot"></div>
             </button>
+            <p class="ph-form-status" id="msg-status" role="status" aria-live="polite"></p>
           </form>
         </div>
 
@@ -403,7 +414,7 @@
   </footer>
 
   <script defer src="lib/manifest.js?v=20260701"></script>
-  <script defer src="main.js?v=20261107d"></script>
+  <script defer src="main.js?v=20261107f"></script>
 
 </body>
 </html>
