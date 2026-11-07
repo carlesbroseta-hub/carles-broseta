@@ -983,7 +983,7 @@
     if (window.innerWidth <= 900) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    var MAX_SCALE = 1.32;
+    var MAX_SCALE = 1.22;
     /* Origen del zoom en CSS: 74% → el margen sobrante a la derecha es 26% de lo que crece */
     var MAX_SHIFT = 0.26 * (MAX_SCALE - 1) * 0.9;
 
