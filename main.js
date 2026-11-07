@@ -1280,6 +1280,11 @@
     }
 
     function openVideo(id, title, trigger) {
+      /* Abierta como archivo local no hay origen web y YouTube da "Error 153": se abre en YouTube */
+      if (location.protocol === 'file:') {
+        window.open('https://youtu.be/' + encodeURIComponent(id), '_blank', 'noopener');
+        return;
+      }
       if (!lb) build();
       lastTrigger = trigger;
       var f = document.createElement('iframe');

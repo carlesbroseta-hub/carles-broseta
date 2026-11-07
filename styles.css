@@ -4838,7 +4838,11 @@ html.ph-lock { overflow: hidden; }
 }
 .ph-lightbox[hidden] { display: none; }
 .ph-lightbox.is-open { opacity: 1; }
-.ph-lightbox-inner { width: min(1100px, 100%); }
+/* Lo más ancho posible (hasta 1400px) sin que el vídeo 16:9 + su título se salgan por abajo */
+.ph-lightbox-inner { width: min(1400px, 100%, calc((100vh - 150px) * 16 / 9)); }
+@supports (height: 100dvh) {
+  .ph-lightbox-inner { width: min(1400px, 100%, calc((100dvh - 150px) * 16 / 9)); }
+}
 .ph-lightbox-frame {
   position: relative;
   aspect-ratio: 16 / 9;
