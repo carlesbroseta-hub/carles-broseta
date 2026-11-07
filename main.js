@@ -974,72 +974,56 @@
     requestAnimationFrame(function() { render(0); });
   }
 
-  /* ── Hero: cinemática de scroll — foto al centro, nombre desaparece ── */
+  /* ── Hero: cinemática de scroll — zoom lento hacia el músico, nombre sale ── */
   function initHeroPhotoScroll() {
-    var hero      = qs('.ph-hero');
-    var text      = qs('.ph-hero-text');
-    var photoWrap = qs('.ph-hero-photo');
-    if (!hero || !text || !photoWrap) return;
+    var hero = qs('.ph-hero');
+    var text = qs('.ph-hero-text');
+    var img  = qs('.ph-hero-bg-img');
+    if (!hero || !text || !img) return;
     if (window.innerWidth <= 900) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    var measured = false;
-    var vpW, vpH, deltaX, deltaY, finalScale;
+    var MAX_SCALE = 1.32;
+    /* Origen del zoom en CSS: 74% → el margen sobrante a la derecha es 26% de lo que crece */
+    var MAX_SHIFT = 0.26 * (MAX_SCALE - 1) * 0.9;
 
-    function measure() {
-      vpW = window.innerWidth  || 1280;
-      vpH = window.innerHeight || 720;
-      var r   = photoWrap.getBoundingClientRect();
-      deltaX  = (vpW / 2) - (r.left + r.width  / 2);
-      deltaY  = (vpH / 2) - (r.top  + r.height / 2);
-      finalScale = Math.min(
-        (vpH * 1.05) / r.height,
-        (vpW * 0.74) / r.width
-      );
-      measured = true;
-    }
-
-    /* Cubic ease-in-out */
     function eio(t) {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
+    function eout(t) { return 1 - Math.pow(1 - t, 3); }
 
     var ticking = false;
 
     function update() {
       ticking = false;
-      var heroH       = hero.offsetHeight;
       var viewH       = window.innerHeight || 720;
-      var scrollSpace = heroH - viewH;
+      var scrollSpace = hero.offsetHeight - viewH;
       if (scrollSpace <= 0) return;
 
       var rawP = Math.max(0, Math.min(1, window.scrollY / scrollSpace));
+      var p    = eio(rawP);
 
-      /* Medir cuando el scroll aún no ha empezado (posición natural de foto) */
-      if (!measured && rawP < 0.05) measure();
-      if (!measured) return;
-
-      var p = eio(rawP);
-
-      /* Texto: sale a la izquierda al mismo ritmo que la foto crece */
-      var alpha = Math.max(0, 1 - p);
-      text.style.opacity       = alpha;
-      text.style.transform     = 'translateX(' + (-200 * p) + 'px)';
+      /* Texto: se va antes que termine el zoom, así el final es solo la foto */
+      var tp    = eout(Math.min(1, rawP / 0.55));
+      var alpha = 1 - tp;
+      text.style.opacity       = alpha.toFixed(3);
+      text.style.transform     = 'translateX(' + (-140 * tp).toFixed(1) + 'px)';
+      text.style.filter        = tp > 0.01 ? 'blur(' + (6 * tp).toFixed(2) + 'px)' : '';
       text.style.pointerEvents = alpha < 0.02 ? 'none' : '';
 
-      /* Foto: se desplaza al centro y crece */
-      var sc = 1 + (finalScale - 1) * p;
-      photoWrap.style.transform =
-        'translateX(' + (deltaX * p).toFixed(1) + 'px) ' +
-        'translateY(' + (deltaY * p).toFixed(1) + 'px) ' +
-        'scale(' + sc.toFixed(4) + ')';
+      /* Foto: zoom hacia el músico y leve deriva hacia el centro, sin dejar bordes */
+      var vpW = window.innerWidth || 1280;
+      img.style.transform =
+        'translateX(' + (-MAX_SHIFT * vpW * p).toFixed(1) + 'px) ' +
+        'scale(' + (1 + (MAX_SCALE - 1) * p).toFixed(4) + ')';
     }
 
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
-
-    window.addEventListener('resize', function () { measured = false; });
+    window.addEventListener('resize', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    });
 
     update();
   }
