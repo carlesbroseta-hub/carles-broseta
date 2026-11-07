@@ -4328,7 +4328,7 @@ body[data-page="profesor"] .ph-hero-text { will-change: transform, opacity; posi
       sin JS no existe .tt-active y el texto entra con su animación normal. ── */
 body[data-page="profesor"] .tt-active .ph-name-line,
 body[data-page="profesor"] .tt-active .ph-claim { animation: none; }
-.tt-char { opacity: 0; transition: opacity 0.24s ease-out; }
+.tt-char { opacity: 0; transition: opacity 0.4s ease-out; }
 .tt-char.is-on { opacity: 1; }
 .tt-char.tt-instant { transition: none; }
 .tt-cursor {
@@ -4342,13 +4342,16 @@ body[data-page="profesor"] .tt-active .ph-claim { animation: none; }
   transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s ease, width 0.3s ease, opacity 0.3s ease;
 }
 .tt-cursor.is-ready { opacity: 1; }
-.tt-cursor.is-jump { transition-duration: 0.38s, 0.3s, 0.3s, 0.3s; }
+.tt-cursor.is-jump { transition-duration: 0.5s, 0.3s, 0.3s, 0.3s; }
 .tt-cursor.no-glide { transition: none; }
 .tt-cursor.is-idle { animation: ttBlink 1.05s ease-in-out infinite; }
 @keyframes ttBlink {
   0%, 45%   { opacity: 1; }
   55%, 100% { opacity: 0.1; }
 }
+/* Entrada más pausada: roles al principio, botones cuando el nombre ya casi está escrito */
+body[data-page="profesor"] .ph-roles        { animation-duration: 1.3s; animation-delay: 0.4s; }
+body[data-page="profesor"] .ph-hero-actions { animation-duration: 1.3s; animation-delay: 3s; }
 
 /* El negro de cbg-hero.jpg está fijado a #0E0E10 al exportarla: sus bordes son invisibles
    sobre la página, así que no hacen falta máscaras ni degradados laterales. */
@@ -4360,7 +4363,7 @@ body[data-page="profesor"] .ph-hero-bg-media {
   width: 82%;
   height: 82%;
   transform-origin: 74% 0%;
-  animation: phHeroIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: phHeroIn 2.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 /* Anclada arriba (0%): si la pantalla obliga a recortar, se recortan los pies, nunca la cabeza */
 body[data-page="profesor"] .ph-hero-bg-img {

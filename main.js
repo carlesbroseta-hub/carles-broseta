@@ -1107,8 +1107,8 @@
     }
 
     var steps = [];
-    nameChars.forEach(function (el)     { steps.push({ el: el, speed: 75, typo: false }); });
-    claimChars.forEach(function (el, k) { steps.push({ el: el, speed: 32, typo: !!typoAt[k] }); });
+    nameChars.forEach(function (el)     { steps.push({ el: el, speed: 110, typo: false }); });
+    claimChars.forEach(function (el, k) { steps.push({ el: el, speed: 45, typo: !!typoAt[k] }); });
 
     function jitter(ms) { return ms * (0.7 + Math.random() * 0.6); }
 
@@ -1136,7 +1136,7 @@
         idle(true);
         cursor.classList.add('is-jump');
         place(el, false);
-        var pause = el === claimChars[0] ? 520 : (el.previousSibling && el.previousSibling.nodeName === 'BR' ? 200 : 300);
+        var pause = el === claimChars[0] ? 700 : (el.previousSibling && el.previousSibling.nodeName === 'BR' ? 280 : 420);
         setTimeout(function () { cursor.classList.remove('is-jump'); next(); }, pause);
         return;
       }
@@ -1156,8 +1156,8 @@
             el.textContent = real;
             if (prev && prev.parentNode === el.parentNode) place(prev, true); else place(el, false);
             idle(false);
-            setTimeout(next, 140);
-          }, 260);
+            setTimeout(next, 180);
+          }, 320);
         }, jitter(s.speed));
         return;
       }
@@ -1173,7 +1173,7 @@
       void cursor.offsetWidth;
       cursor.classList.remove('no-glide');
       cursor.classList.add('is-ready');
-      setTimeout(next, 450);
+      setTimeout(next, 800);
     }
 
     window.addEventListener('resize', function () { if (curEl) place(curEl, curAfter); });
