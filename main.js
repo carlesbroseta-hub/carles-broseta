@@ -1012,9 +1012,9 @@
       text.style.pointerEvents = alpha < 0.02 ? 'none' : '';
 
       /* Foto: zoom hacia el músico y leve deriva hacia el centro, sin dejar bordes */
-      var vpW = window.innerWidth || 1280;
+      var imgW = img.clientWidth || window.innerWidth;
       img.style.transform =
-        'translateX(' + (-MAX_SHIFT * vpW * p).toFixed(1) + 'px) ' +
+        'translateX(' + (-MAX_SHIFT * imgW * p).toFixed(1) + 'px) ' +
         'scale(' + (1 + (MAX_SCALE - 1) * p).toFixed(4) + ')';
     }
 

@@ -4293,11 +4293,12 @@ body[data-page="profesor"] .ph-nav-cta.ph-ihb:hover { opacity: 1; transform: non
 body[data-page="profesor"] .ph-btn-primary.ph-ihb:hover { transform: none; }
 
 /* ── Hero — cinemática de scroll ─────────────────────── */
+/* Sin fondo propio: hereda el del body (#0E0E10 arriba), el mismo negro que lleva la foto */
 body[data-page="profesor"] .ph-hero {
   height: 220vh;
   min-height: unset;
   overflow: visible;
-  background: #0D0D0D;
+  background: transparent;
   display: block;
 }
 /* Bg pasa a sticky para quedarse anclado mientras dura la animación */
@@ -4323,27 +4324,24 @@ body[data-page="profesor"] .ph-hero-inner {
 }
 body[data-page="profesor"] .ph-hero-text { will-change: transform, opacity; }
 
-/* Foto a pantalla completa: entrada suave al cargar (en el wrapper) y zoom de scroll (en la img, vía JS) */
-body[data-page="profesor"] .ph-hero-bg { background: #050505; }
+/* El negro de cbg-hero.jpg está fijado a #0E0E10 al exportarla: sus bordes son invisibles
+   sobre la página, así que no hacen falta máscaras ni degradados laterales. */
+body[data-page="profesor"] .ph-hero-bg { background: transparent; }
 body[data-page="profesor"] .ph-hero-bg-media {
   position: absolute;
   right: 0;
   bottom: 0;
   width: 82%;
   height: 82%;
-  /* El borde superior solo se suaviza un 3%: el pelo empieza al ~4% de la foto */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 3%);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 3%);
-  mask-composite: intersect;
   transform-origin: 74% 0%;
   animation: phHeroIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
+/* Anclada arriba (0%): si la pantalla obliga a recortar, se recortan los pies, nunca la cabeza */
 body[data-page="profesor"] .ph-hero-bg-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 72% center;
+  object-position: 92% 0%;
   filter: none;
   animation: none;
   transform-origin: 74% 0%;
@@ -4351,13 +4349,24 @@ body[data-page="profesor"] .ph-hero-bg-img {
   display: block;
 }
 @keyframes phHeroIn {
-  from { opacity: 0; transform: scale(1.08); }
+  from { opacity: 0; transform: scale(1.06); }
   to   { opacity: 1; transform: scale(1); }
 }
 body[data-page="profesor"] .ph-hero-bg-overlay {
-  background:
-    linear-gradient(90deg, rgba(13,13,13,0.9) 0%, rgba(13,13,13,0.6) 32%, rgba(13,13,13,0) 58%),
-    linear-gradient(180deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0) 18%, rgba(13,13,13,0) 72%, #0D0D0D 100%);
+  background: linear-gradient(180deg, rgba(14,14,16,0) 70%, #0E0E10 100%);
+}
+/* Fundido al tono de "Sobre mí" (#151416): va pegado al final de la cabecera, no al sticky,
+   así solo aparece cuando la cabecera termina y no hay línea de corte entre secciones */
+body[data-page="profesor"] .ph-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 35vh;
+  background: linear-gradient(180deg, rgba(21,20,22,0) 0%, #151416 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 @media (max-width: 900px) {
@@ -4376,12 +4385,10 @@ body[data-page="profesor"] .ph-hero-bg-overlay {
     top: 72px;
     width: 100%;
     height: auto;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 4%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 4%);
   }
-  body[data-page="profesor"] .ph-hero-bg-img { object-position: 80% center; }
+  body[data-page="profesor"] .ph-hero-bg-img { object-position: 80% 0%; }
   body[data-page="profesor"] .ph-hero-bg-overlay {
-    background: linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.05) 22%, rgba(13,13,13,0.7) 40%, rgba(13,13,13,0.9) 60%, #0D0D0D 100%);
+    background: linear-gradient(180deg, rgba(14,14,16,0) 30%, rgba(14,14,16,0.75) 48%, rgba(14,14,16,0.92) 66%, #0E0E10 100%);
   }
   body[data-page="profesor"] .ph-hero-inner {
     position: relative;
