@@ -4331,10 +4331,12 @@ body[data-page="profesor"] .ph-hero-bg-media {
   bottom: 0;
   width: 82%;
   height: 82%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 16%);
+  /* El borde superior solo se suaviza un 3%: el pelo empieza al ~4% de la foto */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 3%);
   -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 16%);
+  mask-image: linear-gradient(to right, transparent 0%, black 22%), linear-gradient(to bottom, transparent 0%, black 3%);
   mask-composite: intersect;
+  transform-origin: 74% 0%;
   animation: phHeroIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 body[data-page="profesor"] .ph-hero-bg-img {
@@ -4344,7 +4346,7 @@ body[data-page="profesor"] .ph-hero-bg-img {
   object-position: 72% center;
   filter: none;
   animation: none;
-  transform-origin: 74% 34%;
+  transform-origin: 74% 0%;
   will-change: transform;
   display: block;
 }
@@ -4371,10 +4373,11 @@ body[data-page="profesor"] .ph-hero-bg-overlay {
     height: auto;
   }
   body[data-page="profesor"] .ph-hero-bg-media {
+    top: 72px;
     width: 100%;
-    height: 100%;
-    -webkit-mask-image: none;
-    mask-image: none;
+    height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 4%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 4%);
   }
   body[data-page="profesor"] .ph-hero-bg-img { object-position: 80% center; }
   body[data-page="profesor"] .ph-hero-bg-overlay {
