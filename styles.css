@@ -4705,7 +4705,12 @@ body[data-page="profesor"] .ph-inbox-toggle:hover {
 
 /* ── Footer ──────────────────────────────────────────── */
 body[data-page="profesor"] .ph-footer      { background: #0E0E10; }
-body[data-page="profesor"] .ph-footer-brand { color: rgba(212,165,116,0.7); }
+body[data-page="profesor"] .ph-footer-inner { justify-content: center; }
+body[data-page="profesor"] .ph-footer-copy {
+  position: static;
+  transform: none;
+  display: block;
+}
 body[data-page="profesor"] .ph-footer-copy  { color: rgba(161,160,160,0.25); }
 body[data-page="profesor"] .ph-footer-link  { color: #D4A574; }
 body[data-page="profesor"] .ph-footer-link:hover { color: #F5F4F2; }
