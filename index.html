@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261107g" />
+  <link rel="stylesheet" href="styles.css?v=20261107h" />
 </head>
 <body data-page="profesor">
 
@@ -314,35 +314,59 @@
         <h2 class="ph-section-title ph-title-light">En vídeo</h2>
       </div>
 
-      <div class="ph-video-row">
+      <!-- Galería acordeón: 5 paneles, el activo ocupa el 52%. Para añadir un vídeo, convierte un
+           panel .is-empty en un <a> como los de Boomwhackers/Mascletà con su id de YouTube. -->
+      <div class="ph-acc" id="ph-acc">
 
-        <a class="ph-video-card reveal" href="https://youtu.be/Tl0VryglcSo" target="_blank" rel="noopener">
-          <div class="ph-video-thumb ph-video-yt" style="background-image:url('https://img.youtube.com/vi/Tl0VryglcSo/maxresdefault.jpg')">
-            <div class="ph-video-play">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                <polygon points="5 3 19 12 5 21 5 3"/>
-              </svg>
-            </div>
-          </div>
-          <div class="ph-video-info">
-            <div class="ph-video-title">Boomwhackers</div>
-            <div class="ph-video-sub">Actividad de percusión corporal con tubos de colores</div>
-          </div>
+        <div class="ph-acc-item is-empty" style="--i:0" aria-hidden="true">
+          <span class="ph-acc-vlabel">Próximamente</span>
+          <span class="ph-acc-body">
+            <span class="ph-acc-title">Próximamente</span>
+            <span class="ph-acc-sub">Nuevo vídeo en preparación.</span>
+          </span>
+        </div>
+
+        <a class="ph-acc-item" style="--i:1" href="https://youtu.be/Tl0VryglcSo" target="_blank" rel="noopener"
+           data-video="Tl0VryglcSo" data-title="Boomwhackers" aria-label="Ver vídeo: Boomwhackers">
+          <img class="ph-acc-img" src="https://img.youtube.com/vi/Tl0VryglcSo/maxresdefault.jpg" alt="" loading="lazy" />
+          <span class="ph-acc-vlabel">Boomwhackers</span>
+          <span class="ph-acc-body">
+            <span class="ph-acc-play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M7 4.5v15l13-7.5z"/></svg>
+            </span>
+            <span class="ph-acc-title">Boomwhackers</span>
+            <span class="ph-acc-sub">Actividad de percusión corporal con tubos de colores.</span>
+          </span>
         </a>
 
-        <a class="ph-video-card reveal" href="https://youtu.be/JNJRGIt7lHQ" target="_blank" rel="noopener">
-          <div class="ph-video-thumb ph-video-yt" style="background-image:url('https://img.youtube.com/vi/JNJRGIt7lHQ/maxresdefault.jpg')">
-            <div class="ph-video-play">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                <polygon points="5 3 19 12 5 21 5 3"/>
-              </svg>
-            </div>
-          </div>
-          <div class="ph-video-info">
-            <div class="ph-video-title">Mascletà Musical</div>
-            <div class="ph-video-sub">Proyecto de composición con percusión y efectos de sonido</div>
-          </div>
+        <a class="ph-acc-item is-active" style="--i:2" href="https://youtu.be/JNJRGIt7lHQ" target="_blank" rel="noopener"
+           data-video="JNJRGIt7lHQ" data-title="Mascletà Musical" aria-label="Ver vídeo: Mascletà Musical">
+          <img class="ph-acc-img" src="https://img.youtube.com/vi/JNJRGIt7lHQ/maxresdefault.jpg" alt="" loading="lazy" />
+          <span class="ph-acc-vlabel">Mascletà Musical</span>
+          <span class="ph-acc-body">
+            <span class="ph-acc-play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M7 4.5v15l13-7.5z"/></svg>
+            </span>
+            <span class="ph-acc-title">Mascletà Musical</span>
+            <span class="ph-acc-sub">Proyecto de composición con percusión y efectos de sonido.</span>
+          </span>
         </a>
+
+        <div class="ph-acc-item is-empty" style="--i:3" aria-hidden="true">
+          <span class="ph-acc-vlabel">Próximamente</span>
+          <span class="ph-acc-body">
+            <span class="ph-acc-title">Próximamente</span>
+            <span class="ph-acc-sub">Nuevo vídeo en preparación.</span>
+          </span>
+        </div>
+
+        <div class="ph-acc-item is-empty" style="--i:4" aria-hidden="true">
+          <span class="ph-acc-vlabel">Próximamente</span>
+          <span class="ph-acc-body">
+            <span class="ph-acc-title">Próximamente</span>
+            <span class="ph-acc-sub">Nuevo vídeo en preparación.</span>
+          </span>
+        </div>
 
       </div>
 
@@ -414,7 +438,7 @@
   </footer>
 
   <script defer src="lib/manifest.js?v=20260701"></script>
-  <script defer src="main.js?v=20261107g"></script>
+  <script defer src="main.js?v=20261107i"></script>
 
 </body>
 </html>

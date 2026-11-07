@@ -1205,6 +1205,112 @@
     });
   }
 
+  /* ── Vídeos: galería acordeón (AccordionGallery) + reproductor en la página ── */
+  function initVideoAccordion() {
+    var acc = qs('#ph-acc');
+    if (!acc || acc.dataset.ready) return;
+    acc.dataset.ready = '1';
+    var items = qsa('.ph-acc-item', acc);
+
+    function activate(item) {
+      items.forEach(function (it) { it.classList.toggle('is-active', it === item); });
+    }
+
+    items.forEach(function (item) {
+      var wasActive = false, touch = false;
+      item.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') activate(item); });
+      item.addEventListener('pointerdown', function (e) {
+        wasActive = item.classList.contains('is-active');
+        touch = e.pointerType !== 'mouse';
+      });
+      item.addEventListener('focus', function () { activate(item); });
+      item.addEventListener('click', function (e) {
+        if (!item.dataset.video) { activate(item); return; }
+        e.preventDefault();
+        /* En táctil el primer toque abre el panel; el segundo reproduce */
+        if (touch && !wasActive) { touch = false; activate(item); return; }
+        touch = false;
+        activate(item);
+        openVideo(item.dataset.video, item.dataset.title || '', item);
+      });
+    });
+
+    /* Comprobación directa en el scroll (no IntersectionObserver): no puede quedarse sin disparar */
+    acc.classList.add('js-reveal');
+    function revealCheck() {
+      if (acc.getBoundingClientRect().top < window.innerHeight * 0.9) {
+        acc.classList.add('is-in');
+        window.removeEventListener('scroll', revealCheck);
+        window.removeEventListener('resize', revealCheck);
+      }
+    }
+    window.addEventListener('scroll', revealCheck, { passive: true });
+    window.addEventListener('resize', revealCheck);
+    revealCheck();
+
+    var lb, frame, titleEl, ytLink, closeBtn, lastTrigger;
+    function build() {
+      lb = document.createElement('div');
+      lb.className = 'ph-lightbox';
+      lb.hidden = true;
+      lb.setAttribute('role', 'dialog');
+      lb.setAttribute('aria-modal', 'true');
+      lb.setAttribute('aria-label', 'Reproductor de vídeo');
+      lb.innerHTML =
+        '<button type="button" class="ph-lightbox-close" aria-label="Cerrar vídeo">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>' +
+        '</button>' +
+        '<div class="ph-lightbox-inner">' +
+          '<div class="ph-lightbox-frame"></div>' +
+          '<div class="ph-lightbox-bar">' +
+            '<span class="ph-lightbox-title"></span>' +
+            '<a class="ph-lightbox-yt" target="_blank" rel="noopener">Ver en YouTube ↗</a>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(lb);
+      frame    = qs('.ph-lightbox-frame', lb);
+      titleEl  = qs('.ph-lightbox-title', lb);
+      ytLink   = qs('.ph-lightbox-yt', lb);
+      closeBtn = qs('.ph-lightbox-close', lb);
+      closeBtn.addEventListener('click', closeVideo);
+      lb.addEventListener('click', function (e) { if (e.target === lb) closeVideo(); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && lb && !lb.hidden) closeVideo();
+      });
+    }
+
+    function openVideo(id, title, trigger) {
+      if (!lb) build();
+      lastTrigger = trigger;
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) +
+              '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+      f.title = title;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      /* YouTube rechaza el reproductor si no recibe el origen de la página */
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.innerHTML = '';
+      frame.appendChild(f);
+      titleEl.textContent = title;
+      ytLink.href = 'https://youtu.be/' + encodeURIComponent(id);
+      lb.hidden = false;
+      document.documentElement.classList.add('ph-lock');
+      requestAnimationFrame(function () { lb.classList.add('is-open'); });
+      closeBtn.focus({ preventScroll: true });
+    }
+
+    function closeVideo() {
+      lb.classList.remove('is-open');
+      document.documentElement.classList.remove('ph-lock');
+      setTimeout(function () {
+        lb.hidden = true;
+        frame.innerHTML = '';
+      }, 350);
+      if (lastTrigger) lastTrigger.focus({ preventScroll: true });
+    }
+  }
+
   /* ── Trayectoria: iluminación por bloque al hacer scroll ── */
   function initTrayReveal() {
     var section = qs('#trayectoria');
@@ -1295,6 +1401,7 @@
     safe(initHeroPhotoScroll, "initHeroPhotoScroll");
     safe(initHeroTyping, "initHeroTyping");
     safe(initProjStarBorder, "initProjStarBorder");
+    safe(initVideoAccordion, "initVideoAccordion");
     safe(initTrayReveal,  "initTrayReveal");
     safe(initAboutReveal, "initAboutReveal");
     safe(initReveals, "initReveals");
