@@ -1,2 +1,9 @@
 image-*.png
+/*.png
+/*.jpg
+/*.jpeg
+/*.heic
 .DS_Store
+firebase.json
+.firebaserc
+.firebase/
